@@ -27,7 +27,7 @@ const state = {
 
 const initStore = () =>{
 
-    console.log(state);
+    loadStore();
 
     console.log('InitStore 🥑');
 }
@@ -35,9 +35,17 @@ const initStore = () =>{
 
 const loadStore = ()=>{
 
-    throw new Error ('Not implemented yet');
+if(!localStorage.getItem('state')) return;
+
+const{todos = [],filter= Filters.All}= JSON.parse (localStorage.getItem('state')); // desestructuración
+state.todos=todos;
+state.filter=filter;
 }
 
+// grabar el state de las piedras en el local storage
+const saveStateToLocalStorage = () => {
+    localStorage.setItem('state',JSON.stringify(state)); // método del objeto json que convierte el state en una cadena de string 
+}
 
 
 /**
@@ -48,6 +56,7 @@ const addTodo = (description) =>{
    if (!description) throw new Error ('Description is required');
    
    state.todos.push (new Todo (description));
+   saveStateToLocalStorage();
 
 }
 
@@ -81,16 +90,17 @@ const toggleTodo = (todoId) =>{ // para actualizar
     }
     return todo;
     })
+    saveStateToLocalStorage();
 }
 
 const deleteTodo = (todoId) =>{
     state.todos = state.todos.filter (todo => todo.id !== todoId ); // Regresar todos los todo cuyo ID sea diferente al que estoy queriendo eliminar
- 
+    saveStateToLocalStorage();
 }
 
 const deleteCompleted = () =>{
-    state.todos = state.todos.filter (todo => todo.done);
-
+    state.todos = state.todos.filter (todo => !todo.done);
+    saveStateToLocalStorage();
 }
 
 
@@ -100,6 +110,7 @@ const deleteCompleted = () =>{
  */
 const setFilter = (newFilter = Filters.All)  =>{
     state.filter = newFilter;
+    saveStateToLocalStorage();
 
 }
 

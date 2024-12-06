@@ -6,6 +6,7 @@ import { renderTodos } from './use-cases';
 
 // esto permite agrupar todos los IDS en un solo objeto 
 const elementIDs ={
+    ClearCompleted: '.clear-completed',
     TodoList: '.todo-list',
     NewTodoInput: '#new-todo-input',
 }
@@ -40,6 +41,8 @@ export const App = (elementId) =>{
    // Referencias HTML
 
    const newDescriptionInput = document.querySelector (elementIDs.NewTodoInput);
+   const todoListUL = document.querySelector (elementIDs.TodoList);
+   const clearCompletedButton = document.querySelector(elementIDs.ClearCompleted);
 
 
    //Listeners
@@ -53,7 +56,37 @@ export const App = (elementId) =>{
 
     todoStore.addTodo(event.target.value); // valor de la caja de texto
 
-    displayTodos();
+    displayTodos(); // renderizar
     event.target.value ='';// despues de haber insertado el valor o la piedra queda vacio
    });
+
+
+
+   todoListUL.addEventListener('click', (event)=>{
+        const element = event.target.closest('[data-id]'); // busca el elemento mas cercano con el data id
+        todoStore.toggleTodo(element.getAttribute('data-id')); // muestra el id del item
+        displayTodos();
+    });
+
+// ELIMINAR UN TODO
+    todoListUL.addEventListener('click', (event)=>{
+        // Verifica si el elemento posee la clase 'destroy'
+        if (event.target.classList.contains('destroy')){
+         const element = event.target.closest('[data-id]');  // busca el elemento mas cercano con el data id
+         if (element) {
+            const todoId = element.getAttribute('data-id');// Obtiene el 'data-id'
+            console.log(`Eliminando el elemento con el identificador: ${todoId}`); // método TODO
+            todoStore.deleteTodo(todoId); // Actualiza laa vista
+            displayTodos();
+         }
+        }
+     });
+
+
+    clearCompletedButton.addEventListener('click', ()=>{
+        todoStore.deleteCompleted();
+        displayTodos();
+    });
+
+     
 }
